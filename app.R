@@ -1,11 +1,9 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+#' ---
+#' title: "ABS Plotter"
+#' author: "Oscar Lane"
+#' ---
+#' 
+#' Shiny app for plotting ABS time series data
 
 library(shiny)
 library(readabs)
@@ -31,7 +29,10 @@ ui <- fluidPage(
                         multiple = FALSE),
             uiOutput("tableDropdown"),
             uiOutput("seriesDropdown"),
-            uiOutput("seriesTypeDropdown")
+            uiOutput("seriesTypeDropdown"),
+            selectInput(inputId = "chartType",
+                        label = "Chart Type:",
+                        choices = c("Line", "Bar"))
         ),
         
         # Show a plot of the series
@@ -90,12 +91,17 @@ server <- function(input, output) {
     
     # Plot series
     output$absPlot <- renderPlot({
-        plot_data() %>% 
+        plt <- plot_data() %>% 
             filter(table_title == input$tableNumber,
                    series == input$series,
                    series_type == input$seriesType) %>% 
-            ggplot(aes(x = date, y = value)) +
-            geom_line()
+            ggplot(aes(x = date, y = value))
+        if (input$chartType == "Line") {
+            plt <- plt + geom_line()
+        } else if (input$chartType == "Bar") {
+            plt <- plt + geom_col()
+        }
+        plt
     })
 }
 
