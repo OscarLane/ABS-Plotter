@@ -12,9 +12,9 @@ library(readabs)
 library(tidyverse)
 
 # Read data pre-downloaded
-cat_nos <- c(LFS = "6202.0")
+cat_nos <- c(LFS = "6202.0", National.Accounts = "5206.0")
 
-abs_data <- read_abs(cat_no = cat_nos, path = "data")
+abs_data <- map_dfr(cat_nos, ~ read_abs(., path = "data"))
 
 # Define UI for app
 ui <- fluidPage(
